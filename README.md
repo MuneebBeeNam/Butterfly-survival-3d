@@ -2,7 +2,8 @@
 
 > **Fly across a sun-dappled 3D woodland sanctuary, fuel your wings by eating small wild fruits, and evade hungry predators hunting you from land, pond, and sky — with only 2 lives!**
 
-🌐 **Play Live in Browser:** **[https://muneebbeenam.github.io/Butterfly-survival-3d/](https://muneebbeenam.github.io/Butterfly-survival-3d/)**
+🌐 **Play Live on Netlify:** **[https://butterfly-survival-3d.netlify.app](https://butterfly-survival-3d.netlify.app)**
+🌐 **GitHub Pages Mirror:** **[https://muneebbeenam.github.io/Butterfly-survival-3d/](https://muneebbeenam.github.io/Butterfly-survival-3d/)**
 
 ![Wings of the Wild — Start Screen](./screenshots/menu-screen.png)
 
