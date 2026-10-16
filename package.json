@@ -1,0 +1,12 @@
+{
+  "name": "wings-of-the-wild-3d-butterfly",
+  "version": "1.0.0",
+  "description": "3D Butterfly Survival Browser Game with wild animal predators, small fruits for fuel, and 2 lives",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "three": "^0.160.0"
+  }
+}

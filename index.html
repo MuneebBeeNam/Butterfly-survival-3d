@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wings of the Wild — 3D Butterfly Survival</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <!-- 3D WebGL Canvas Container -->
+  <div id="canvas-container"></div>
+
+  <!-- Damage Vignette Flash -->
+  <div id="damage-flash" class="damage-flash"></div>
+
+  <!-- In-Game HUD -->
+  <div id="hud" class="hidden">
+    <div class="hud-top">
+      <!-- Left: 2 Lives & Nectar Fuel Gauge -->
+      <div class="hud-card status-panel">
+        <div class="lives-row">
+          <span class="label-title">Butterfly Lives (Max 2)</span>
+          <div class="lives-icons">
+            <span id="life-1" class="life-icon">🦋 Life 1</span>
+            <span id="life-2" class="life-icon">🦋 Life 2</span>
+          </div>
+        </div>
+
+        <div class="fuel-header">
+          <span class="label-title">🍓 Nectar Fuel</span>
+          <span id="fuel-pct" class="fuel-pct">100%</span>
+        </div>
+        <div class="fuel-track">
+          <div id="fuel-fill" class="fuel-fill"></div>
+        </div>
+
+        <div id="dash-status" class="dash-badge ready">
+          ⚡ Flutter Dash Ready [F / R-Click]
+        </div>
+      </div>
+
+      <!-- Center: Dynamic Alerts & Predator Threat Banner -->
+      <div class="hud-center-alerts">
+        <div id="threat-indicator" class="threat-banner hidden">
+          🐾 PREDATOR HUNTING YOU!
+        </div>
+        <div id="fuel-warning" class="fuel-warning hidden">
+          ⚠️ Low Nectar Fuel! Swoop down & eat small fruits!
+        </div>
+        <div id="event-toast" class="event-toast"></div>
+      </div>
+
+      <!-- Right: Score, Fruits Eaten, Survival Time & Audio -->
+      <div class="hud-card stats-panel">
+        <div class="stat-item">
+          <div class="label-title">Score</div>
+          <div id="score-val" class="stat-val">0</div>
+        </div>
+        <div class="stat-item">
+          <div class="label-title">Fruits</div>
+          <div id="fruits-val" class="stat-val">0</div>
+        </div>
+        <div class="stat-item">
+          <div class="label-title">Survived</div>
+          <div id="time-val" class="stat-val">0s</div>
+        </div>
+        <button id="mute-btn" class="hud-btn">🔊 Sound: On</button>
+      </div>
+    </div>
+
+    <!-- Bottom: Flight Controls Guide & Live Radar Minimap -->
+    <div class="hud-bottom">
+      <div class="hud-card controls-hint">
+        <div><span class="key-pill">W A S D</span> Fly &amp; Bank &nbsp;|&nbsp; <span class="key-pill">Mouse</span> or <span class="key-pill">Q / E</span> Look Around</div>
+        <div><span class="key-pill">Space</span> Flap Higher &nbsp;|&nbsp; <span class="key-pill">Shift</span> / <span class="key-pill">C</span> Swoop Down</div>
+        <div><span class="key-pill">F</span> or <span class="key-pill">Right-Click</span> Flutter Dash &nbsp;|&nbsp; <span class="key-pill">P</span> Pause</div>
+      </div>
+
+      <div class="hud-card radar-card">
+        <div class="label-title" style="margin-bottom: 6px;">Sanctuary Radar</div>
+        <canvas id="radar-canvas" width="146" height="146"></canvas>
+        <div class="radar-legend">
+          <span><i class="dot" style="background:#fb7185"></i>Fruit</span>
+          <span><i class="dot" style="background:#ffd700"></i>Gold</span>
+          <span><i class="dot" style="background:#ef4444"></i>Hunter</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Start Screen Modal -->
+  <div id="start-screen" class="modal-overlay">
+    <div class="modal-card">
+      <span class="game-badge">3D Browser Survival Game</span>
+      <h1 class="game-title">Wings of the Wild</h1>
+      <p class="game-subtitle">
+        Fly across a sun-dappled 3D woodland sanctuary, fuel your wings by eating small wild fruits, and evade hungry predators hunting you from land, pond, and sky. <strong>You only have 2 lives!</strong>
+      </p>
+
+      <div class="label-title">Choose Your Butterfly Wing Pattern</div>
+      <div class="species-grid">
+        <button class="species-btn active" data-theme="monarch">
+          <span class="swatch" style="background: linear-gradient(90deg, #ff6b00, #ffb703);"></span>
+          Monarch Blaze
+        </button>
+        <button class="species-btn" data-theme="morpho">
+          <span class="swatch" style="background: linear-gradient(90deg, #0077ff, #00f0ff);"></span>
+          Blue Morpho
+        </button>
+        <button class="species-btn" data-theme="emerald">
+          <span class="swatch" style="background: linear-gradient(90deg, #10b981, #a7f3d0);"></span>
+          Emerald Tail
+        </button>
+        <button class="species-btn" data-theme="sunset">
+          <span class="swatch" style="background: linear-gradient(90deg, #e11d48, #fde047);"></span>
+          Crimson Empress
+        </button>
+      </div>
+
+      <div class="info-columns">
+        <div class="info-box">
+          <h4>🍓 Fuel &amp; Small Fruits</h4>
+          <div>• Flying &amp; climbing steadily burns <strong>Nectar Fuel</strong>.</div>
+          <div>• Swoop onto bushes, pond pads &amp; tree branches to eat <strong>Wild Berries</strong>, <strong>Dewberries</strong> &amp; <strong>Golden Sun-Berries</strong>.</div>
+          <div>• Running out of fuel causes your wings to sputter and sink!</div>
+        </div>
+        <div class="info-box">
+          <h4>🦊 Wild Animal Hunters</h4>
+          <div>• <strong>Red Foxes &amp; Lynxes</strong> stalk the grass and leap into mid-air.</div>
+          <div>• <strong>Giant Bullfrogs</strong> snipe with sticky tongues from pond lily pads.</div>
+          <div>• <strong>Peregrine Hawks</strong> circle high and dive-bomb if you linger in the open sky!</div>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 16px; font-size: 0.85rem; color: #94a3b8;">
+        🏆 Personal Best Score: <strong class="best-score-val" style="color: #fde047;">0</strong>
+      </div>
+
+      <button id="start-btn" class="primary-btn">🦋 Take Flight (2 Lives)</button>
+    </div>
+  </div>
+
+  <!-- Pause Modal -->
+  <div id="pause-screen" class="modal-overlay hidden">
+    <div class="modal-card" style="max-width: 420px;">
+      <span class="game-badge">Game Paused</span>
+      <h2 class="game-title" style="font-size: 2rem;">Resting Wings</h2>
+      <p class="game-subtitle">Take a breather before diving back into the wild meadow.</p>
+      <button id="resume-btn" class="primary-btn">Resume Flight</button>
+    </div>
+  </div>
+
+  <!-- Game Over Modal -->
+  <div id="gameover-screen" class="modal-overlay hidden">
+    <div class="modal-card" style="max-width: 520px;">
+      <span class="game-badge" style="background: rgba(239, 68, 68, 0.22); color: #fca5a5; border-color: rgba(248, 113, 113, 0.45);">
+        Both Lives Lost
+      </span>
+      <h2 class="game-title" style="font-size: 2.2rem;">Flight Ended</h2>
+      <p id="gameover-cause" class="game-subtitle" style="color: #fda4af; font-weight: 700; margin-bottom: 10px;">
+        Hunted by a Red Fox
+      </p>
+
+      <div class="gameover-stats">
+        <div class="go-stat">
+          <div class="label-title">Final Score</div>
+          <div id="final-score" class="num">0</div>
+        </div>
+        <div class="go-stat">
+          <div class="label-title">Fruits Eaten</div>
+          <div id="final-fruits" class="num">0</div>
+        </div>
+        <div class="go-stat">
+          <div class="label-title">Survived</div>
+          <div id="final-time" class="num">0.0s</div>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 20px; font-size: 0.88rem; color: #cbd5e1;">
+        🏆 Best Record: <strong class="best-score-val" style="color: #fde047;">0</strong>
+      </div>
+
+      <button id="restart-btn" class="primary-btn">🦋 Fly Again (2 Lives)</button>
+    </div>
+  </div>
+
+  <!-- Three.js (Local Vendor Bundle with CDN Fallback) -->
+  <script src="./vendor/three.min.js"></script>
+  <script>
+    if (typeof THREE === 'undefined') {
+      document.write('<script src="https://unpkg.com/three@0.160.0/build/three.min.js"><\/script>');
+    }
+  </script>
+
+  <!-- Modular Game Scripts -->
+  <script src="./js/audio.js"></script>
+  <script src="./js/particles.js"></script>
+  <script src="./js/world.js"></script>
+  <script src="./js/butterfly.js"></script>
+  <script src="./js/fruits.js"></script>
+  <script src="./js/predators.js"></script>
+  <script src="./js/game.js"></script>
+</body>
+</html>
