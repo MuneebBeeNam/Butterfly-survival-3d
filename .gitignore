@@ -16,5 +16,6 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Temporary capture scripts
+# Temporary capture scripts & local Netlify state
 capture_screenshots.js
+.netlify/
